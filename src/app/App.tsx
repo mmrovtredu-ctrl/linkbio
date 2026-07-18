@@ -215,6 +215,28 @@ const KEYFRAMES = `
     from { width: 0%; }
     to { width: 85%; }
   }
+  @keyframes typing-arm {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(2.2px); }
+  }
+  @keyframes screen-glow {
+    0%, 100% { opacity: 0.55; }
+    50% { opacity: 0.95; }
+  }
+  @keyframes head-bob {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    50% { transform: translateY(1.4px) rotate(-1.2deg); }
+  }
+  @keyframes ponytail-sway {
+    0%, 100% { transform: rotate(0deg); }
+    50% { transform: rotate(4deg); }
+  }
+
+  .typing-arm-l { animation: typing-arm 0.5s ease-in-out infinite; transform-origin: right center; }
+  .typing-arm-r { animation: typing-arm 0.5s ease-in-out infinite 0.25s; transform-origin: left center; }
+  .pc-glow { animation: screen-glow 2.4s ease-in-out infinite; }
+  .girl-head { animation: head-bob 3.2s ease-in-out infinite; transform-origin: center bottom; }
+  .girl-ponytail { animation: ponytail-sway 3.2s ease-in-out infinite; transform-origin: top center; }
 
   @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after {
@@ -236,6 +258,80 @@ const KEYFRAMES = `
   ::-webkit-scrollbar { display: none; }
   * { scrollbar-width: none; }
 `;
+
+// ─── TypingGirl (animação: personagem no computador) ───────────────────────────
+
+function TypingGirl() {
+  return (
+    <svg
+      viewBox="0 0 170 120"
+      width="140"
+      height="99"
+      aria-hidden="true"
+      style={{ display: "block", filter: "drop-shadow(0 6px 10px rgba(0,0,0,0.35))" }}
+    >
+      {/* cadeira */}
+      <rect x="18" y="62" width="8" height="34" rx="3" fill="#4A4A52" />
+      <rect x="8" y="96" width="30" height="5" rx="2.5" fill="#3C3C44" />
+      <rect x="14" y="46" width="10" height="22" rx="4" fill="#4A4A52" />
+
+      {/* rabo de cavalo */}
+      <g className="girl-ponytail">
+        <path d="M38 26 C 28 30, 24 44, 30 54 C 33 58, 38 56, 37 50 C 36 42, 38 34, 42 30 Z" fill="#6E5A7E" />
+      </g>
+
+      {/* cabeça + rosto */}
+      <g className="girl-head">
+        <circle cx="48" cy="28" r="11" fill="#E8B9A0" />
+        {/* cabelo */}
+        <path d="M37 26 C 36 15, 48 12, 54 16 C 60 20, 60 26, 58 29 C 57 22, 50 18, 44 21 C 40 23, 38 25, 37 26 Z" fill="#7C6690" />
+        {/* olho (perfil) */}
+        <circle cx="53.5" cy="27" r="1.4" fill="#3A3A44" />
+      </g>
+
+      {/* tronco */}
+      <path d="M40 38 C 36 44, 34 54, 36 64 L 56 64 C 58 54, 56 44, 52 38 C 48 35, 44 35, 40 38 Z" fill="#8A7FA8" />
+
+      {/* braços digitando */}
+      <g className="typing-arm-l">
+        <path d="M50 46 C 58 48, 66 52, 74 56 L 72 61 C 64 58, 56 55, 49 53 Z" fill="#E8B9A0" />
+      </g>
+      <g className="typing-arm-r">
+        <path d="M52 50 C 60 53, 68 57, 78 60 L 76 65 C 67 62, 58 58, 51 56 Z" fill="#D9A98F" />
+      </g>
+
+      {/* pernas */}
+      <path d="M38 64 L 56 64 L 58 74 L 44 74 Z" fill="#5A5468" />
+      <rect x="42" y="74" width="7" height="18" rx="3" fill="#5A5468" />
+      <rect x="52" y="74" width="7" height="18" rx="3" fill="#5A5468" />
+      <rect x="40" y="91" width="12" height="4" rx="2" fill="#3C3C44" />
+      <rect x="50" y="91" width="12" height="4" rx="2" fill="#3C3C44" />
+
+      {/* mesa */}
+      <rect x="70" y="66" width="92" height="6" rx="3" fill="#55555E" />
+      <rect x="80" y="72" width="7" height="26" rx="3" fill="#44444C" />
+      <rect x="146" y="72" width="7" height="26" rx="3" fill="#44444C" />
+
+      {/* notebook */}
+      <g>
+        {/* tela */}
+        <rect x="96" y="34" width="44" height="30" rx="3" fill="#2E2E36" stroke="#55555E" strokeWidth="2" />
+        <rect className="pc-glow" x="100" y="38" width="36" height="22" rx="2" fill="#9AB8CC" />
+        {/* linhas de "código" na tela */}
+        <g fill="#5F7A8C">
+          <rect x="103" y="42" width="18" height="2.4" rx="1.2" />
+          <rect x="103" y="47" width="26" height="2.4" rx="1.2" />
+          <rect x="103" y="52" width="14" height="2.4" rx="1.2" />
+        </g>
+        {/* base / teclado */}
+        <path d="M92 64 L 144 64 L 148 68 L 88 68 Z" fill="#4A4A52" />
+      </g>
+
+      {/* caneca */}
+      <rect x="152" y="58" width="8" height="9" rx="2" fill="#6E6E78" />
+    </svg>
+  );
+}
 
 // ─── World3DCard (Hub cards) ───────────────────────────────────────────────────
 
@@ -308,6 +404,12 @@ function World3DCard({ worldId, index, onClick }: World3DCardProps) {
 
   const isTikTok = worldId === "tiktok";
   const isMercado = worldId === "mercado";
+  const emConstrucao = isTikTok || isMercado; // mundos ainda não publicados
+
+  const handleClick = () => {
+    if (emConstrucao) return; // Mercado Livre e TikTok ainda em produção
+    onClick();
+  };
 
   return (
     <motion.div
@@ -315,7 +417,7 @@ function World3DCard({ worldId, index, onClick }: World3DCardProps) {
       initial={{ opacity: 0, y: 40 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, delay: index * 0.1, ease: [0.22, 1, 0.36, 1] }}
-      style={{ perspective: "1200px", cursor: "pointer" }}
+      style={{ perspective: "1200px", cursor: emConstrucao ? "default" : "pointer" }}
       className="w-full"
       onMouseMove={handleMouseMove}
       onMouseLeave={() => { setInteracting(false); resetTilt(); }}
@@ -323,11 +425,12 @@ function World3DCard({ worldId, index, onClick }: World3DCardProps) {
       onTouchStart={() => setInteracting(true)}
       onTouchMove={handleTouchMove}
       onTouchEnd={() => { setInteracting(false); resetTilt(); }}
-      onClick={onClick}
+      onClick={handleClick}
       role="button"
-      aria-label={`Entrar no mundo ${world.name}`}
+      aria-label={emConstrucao ? `${world.name} — em construção` : `Entrar no mundo ${world.name}`}
+      aria-disabled={emConstrucao}
       tabIndex={0}
-      onKeyDown={(e) => e.key === "Enter" && onClick()}
+      onKeyDown={(e) => e.key === "Enter" && handleClick()}
     >
       <div
         className={`hub-card-${index} ${interacting ? "hub-card-interacting" : ""} relative overflow-hidden`}
@@ -338,7 +441,9 @@ function World3DCard({ worldId, index, onClick }: World3DCardProps) {
             : undefined,
           transition: interacting ? "none" : "transform 0.6s cubic-bezier(0.22,1,0.36,1)",
           borderRadius: world.radius,
-          background: world.cardGrad,
+          background: isTikTok
+            ? "linear-gradient(135deg, #26262B 0%, #35353C 55%, #2B2B30 100%)"
+            : world.cardGrad,
           minHeight: "170px",
           boxShadow: `${shadowX}px ${shadowY + 20}px ${shadowBlur}px rgba(0,0,0,0.55), 0 0 0 1px rgba(255,255,255,0.08)`,
           willChange: "transform",
@@ -350,7 +455,7 @@ function World3DCard({ worldId, index, onClick }: World3DCardProps) {
           style={{
             position: "absolute", inset: 0,
             backgroundImage: isTikTok
-              ? "radial-gradient(ellipse at 20% 80%, rgba(37,244,238,0.15) 0%, transparent 60%), radial-gradient(ellipse at 80% 20%, rgba(254,44,85,0.15) 0%, transparent 60%)"
+              ? "radial-gradient(ellipse at 20% 80%, rgba(255,255,255,0.05) 0%, transparent 60%), radial-gradient(ellipse at 80% 20%, rgba(255,255,255,0.04) 0%, transparent 60%)"
               : isMercado
               ? "radial-gradient(ellipse at 30% 70%, rgba(52,131,250,0.12) 0%, transparent 60%)"
               : "radial-gradient(ellipse at 80% 20%, rgba(255,255,255,0.15) 0%, transparent 60%)",
@@ -358,9 +463,13 @@ function World3DCard({ worldId, index, onClick }: World3DCardProps) {
           }}
         />
 
-        {/* Floating emoji decorations */}
+        {/* Floating emoji decorations / animação em construção */}
         <div aria-hidden="true" className="absolute inset-0 overflow-hidden pointer-events-none" style={{ borderRadius: "inherit" }}>
-          {world.emojis.slice(0, 3).map((emoji, i) => (
+          {isTikTok ? (
+            <div style={{ position: "absolute", right: "6px", bottom: "2px", opacity: 0.9 }}>
+              <TypingGirl />
+            </div>
+          ) : world.emojis.slice(0, 3).map((emoji, i) => (
             <span
               key={i}
               style={{
@@ -391,13 +500,12 @@ function World3DCard({ worldId, index, onClick }: World3DCardProps) {
           <div>
             {isTikTok ? (
               <h2
-                className="tiktok-glitch font-black uppercase tracking-wider"
+                className="font-black uppercase tracking-wider"
                 style={{
                   fontFamily: world.font,
                   fontSize: "clamp(28px, 8vw, 38px)",
-                  color: "#FFFFFF",
+                  color: "#9A9AA5",
                   letterSpacing: "0.06em",
-                  textShadow: "3px 0 #25F4EE, -3px 0 #FE2C55",
                   lineHeight: 1,
                 }}
               >
@@ -435,7 +543,7 @@ function World3DCard({ worldId, index, onClick }: World3DCardProps) {
                 fontSize: "15px",
                 fontWeight: 600,
                 marginTop: "6px",
-                color: isMercado ? "#444" : isTikTok ? "#25F4EE" : "rgba(255,255,255,0.85)",
+                color: isMercado ? "#444" : isTikTok ? "#84848F" : "rgba(255,255,255,0.85)",
               }}
             >
               {world.tagline}
@@ -443,26 +551,30 @@ function World3DCard({ worldId, index, onClick }: World3DCardProps) {
           </div>
 
           {/* CTA row */}
-          <div className="flex items-center gap-3 mt-4">
+          <div
+            className="flex items-center gap-3 mt-4"
+            style={{ justifyContent: isMercado ? "center" : "flex-start" }}
+          >
             <span
               style={{
                 fontFamily: world.font,
                 fontSize: isTikTok ? "13px" : "14px",
-                fontWeight: isTikTok ? 700 : 700,
+                fontWeight: 700,
                 letterSpacing: isTikTok ? "0.1em" : "0.02em",
                 textTransform: isTikTok ? "uppercase" : "none",
-                color: isMercado ? world.accent : isTikTok ? "#FE2C55" : "rgba(255,255,255,0.9)",
-                background: isMercado ? "rgba(52,131,250,0.12)" : isTikTok ? "rgba(254,44,85,0.15)" : "rgba(255,255,255,0.18)",
+                color: isMercado ? "#7A6A00" : isTikTok ? "#9A9AA5" : "rgba(255,255,255,0.9)",
+                background: isMercado ? "rgba(0,0,0,0.08)" : isTikTok ? "rgba(255,255,255,0.07)" : "rgba(255,255,255,0.18)",
                 backdropFilter: "blur(8px)",
                 padding: "8px 18px",
                 borderRadius: isTikTok ? "3px" : "100px",
-                border: isMercado ? "1.5px solid rgba(52,131,250,0.3)" : isTikTok ? "1.5px solid rgba(254,44,85,0.5)" : "1.5px solid rgba(255,255,255,0.3)",
+                border: isMercado ? "1.5px solid rgba(0,0,0,0.18)" : isTikTok ? "1.5px solid rgba(255,255,255,0.18)" : "1.5px solid rgba(255,255,255,0.3)",
                 minHeight: "36px",
                 display: "flex",
                 alignItems: "center",
+                gap: "6px",
               }}
             >
-              {isTikTok ? "EXPLORAR →" : "Explorar →"}
+              {isTikTok ? "🚧 EM CONSTRUÇÃO" : isMercado ? "🛠️ Em produção" : "Explorar →"}
             </span>
           </div>
         </div>
@@ -502,26 +614,14 @@ function World3DCard({ worldId, index, onClick }: World3DCardProps) {
           </div>
         )}
 
-        {/* Mercado Livre: "Chegando amanhã" bar */}
-        {isMercado && (
-          <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, padding: "0 24px 16px", transform: "translateZ(20px)" }}>
-            <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-              <span style={{ fontSize: "11px", fontFamily: world.font, color: "#3483FA", fontWeight: 600 }}>🚚 Chegando amanhã</span>
-              <div style={{ flex: 1, height: "4px", background: "rgba(52,131,250,0.2)", borderRadius: "2px", overflow: "hidden" }}>
-                <div style={{ height: "100%", background: "#3483FA", borderRadius: "2px", animation: "progress-fill 2s ease-out forwards" }} />
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* TikTok: neon border glow */}
+        {/* TikTok: borda sutil (em construção) */}
         {isTikTok && (
           <div
             aria-hidden="true"
             style={{
               position: "absolute", inset: 0, borderRadius: world.radius,
               pointerEvents: "none",
-              boxShadow: "inset 0 0 0 1.5px rgba(37,244,238,0.3)",
+              boxShadow: "inset 0 0 0 1.5px rgba(255,255,255,0.10)",
             }}
           />
         )}
@@ -812,6 +912,9 @@ function Footer({ world }: { world?: typeof WORLDS[WorldId] }) {
   );
 }
 
+// URL do site da Shopee já publicado (mundo ativo)
+const SHOPEE_SITE_URL = "https://shoppe-zeta-three.vercel.app/";
+
 // ─── Hub Screen ────────────────────────────────────────────────────────────────
 
 interface HubScreenProps {
@@ -916,7 +1019,18 @@ function HubScreen({ onEnterWorld }: HubScreenProps) {
         className="lg:grid-cols-3 lg:max-w-5xl lg:gap-6 lg:grid"
       >
         {(["shopee", "mercado", "tiktok"] as WorldId[]).map((id, i) => (
-          <World3DCard key={id} worldId={id} index={i} onClick={() => onEnterWorld(id)} />
+          <World3DCard
+            key={id}
+            worldId={id}
+            index={i}
+            onClick={() => {
+              if (id === "shopee") {
+                window.location.assign(SHOPEE_SITE_URL);
+              } else {
+                onEnterWorld(id);
+              }
+            }}
+          />
         ))}
       </div>
 
