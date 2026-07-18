@@ -232,6 +232,40 @@ const KEYFRAMES = `
     50% { transform: rotate(4deg); }
   }
 
+  /* ── Fundo do mar ─────────────────────────────── */
+  @keyframes fish-swim-r {
+    0%   { transform: translateX(-15vw) translateY(0) scaleX(1); }
+    50%  { transform: translateX(55vw) translateY(-14px) scaleX(1); }
+    100% { transform: translateX(120vw) translateY(0) scaleX(1); }
+  }
+  @keyframes fish-swim-l {
+    0%   { transform: translateX(120vw) translateY(0) scaleX(-1); }
+    50%  { transform: translateX(45vw) translateY(16px) scaleX(-1); }
+    100% { transform: translateX(-20vw) translateY(0) scaleX(-1); }
+  }
+  @keyframes algae-sway {
+    0%, 100% { transform: rotate(-5deg); }
+    50%      { transform: rotate(6deg); }
+  }
+  @keyframes algae-sway-2 {
+    0%, 100% { transform: rotate(4deg); }
+    50%      { transform: rotate(-6deg); }
+  }
+  @keyframes bubble-rise {
+    0%   { transform: translateY(0) translateX(0); opacity: 0; }
+    10%  { opacity: 0.7; }
+    90%  { opacity: 0.5; }
+    100% { transform: translateY(-88vh) translateX(14px); opacity: 0; }
+  }
+  @keyframes water-shimmer {
+    0%, 100% { opacity: 0.25; transform: translateY(0); }
+    50%      { opacity: 0.5; transform: translateY(-10px); }
+  }
+
+  .algae-sway   { animation: algae-sway 4.5s ease-in-out infinite; transform-origin: bottom center; }
+  .algae-sway-2 { animation: algae-sway-2 5.5s ease-in-out infinite; transform-origin: bottom center; }
+  .water-shimmer { animation: water-shimmer 7s ease-in-out infinite; }
+
   .typing-arm-l { animation: typing-arm 0.5s ease-in-out infinite; transform-origin: right center; }
   .typing-arm-r { animation: typing-arm 0.5s ease-in-out infinite 0.25s; transform-origin: left center; }
   .pc-glow { animation: screen-glow 2.4s ease-in-out infinite; }
@@ -843,12 +877,12 @@ function EmptyState({ world }: { world: typeof WORLDS[WorldId] }) {
 // ─── Footer ────────────────────────────────────────────────────────────────────
 
 function Footer({ world }: { world?: typeof WORLDS[WorldId] }) {
-  const bg = world ? world.screenBg : "#0A0A0F";
-  const text = world ? world.textMuted : "#8080A0";
+  const bg = world ? world.screenBg : "transparent";
+  const text = world ? world.textMuted : "#BEE7FF";
   const font = world ? world.font : "'Plus Jakarta Sans', sans-serif";
   const borderColor = world
     ? (world.id === "tiktok" ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.08)")
-    : "rgba(255,255,255,0.08)";
+    : "rgba(190,231,255,0.15)";
 
   return (
     <footer
@@ -860,6 +894,8 @@ function Footer({ world }: { world?: typeof WORLDS[WorldId] }) {
         flexDirection: "column",
         gap: "8px",
         alignItems: "center",
+        position: "relative",
+        zIndex: 1,
       }}
     >
       <div style={{ display: "flex", gap: "20px", marginBottom: "4px" }}>
@@ -891,6 +927,117 @@ const SHOPEE_SITE_URL = "https://shoppe-zeta-three.vercel.app/";
 
 // ─── Hub Screen ────────────────────────────────────────────────────────────────
 
+// ─── OceanBackground (fundo do mar interativo) ─────────────────────────────────
+
+function Fish({ color, size }: { color: string; size: number }) {
+  return (
+    <svg viewBox="0 0 64 34" width={size} height={size * 0.53} aria-hidden="true" style={{ display: "block", filter: "drop-shadow(0 2px 4px rgba(0,0,0,0.25))" }}>
+      {/* corpo */}
+      <path d="M6 17 C 14 4, 40 4, 50 17 C 40 30, 14 30, 6 17 Z" fill={color} />
+      {/* cauda */}
+      <path d="M50 17 L 63 7 L 60 17 L 63 27 Z" fill={color} opacity="0.85" />
+      {/* olho */}
+      <circle cx="18" cy="15" r="2.2" fill="#fff" />
+      <circle cx="18.6" cy="15" r="1.1" fill="#0A2540" />
+      {/* barbatana */}
+      <path d="M26 17 C 30 22, 36 22, 38 25 C 32 25, 28 22, 26 17 Z" fill="rgba(255,255,255,0.35)" />
+    </svg>
+  );
+}
+
+function Algae({ tall, color, className }: { tall: number; color: string; className: string }) {
+  return (
+    <svg viewBox={`0 0 24 ${tall}`} width={24} height={tall} aria-hidden="true" className={className} style={{ display: "block" }}>
+      <path d={`M12 ${tall} C 4 ${tall * 0.7}, 20 ${tall * 0.5}, 10 ${tall * 0.28} C 4 ${tall * 0.14}, 14 ${tall * 0.05}, 12 0`} fill="none" stroke={color} strokeWidth="7" strokeLinecap="round" opacity="0.8" />
+    </svg>
+  );
+}
+
+function OceanBackground() {
+  const fishes = [
+    { top: "18%", dur: 26, delay: 0, dir: "r", color: "#FF9F4D", size: 46 },
+    { top: "34%", dur: 34, delay: 4, dir: "l", color: "#6FE3FF", size: 34 },
+    { top: "52%", dur: 30, delay: 9, dir: "r", color: "#FFD24D", size: 40 },
+    { top: "68%", dur: 38, delay: 2, dir: "l", color: "#FF7D9C", size: 30 },
+    { top: "80%", dur: 28, delay: 13, dir: "r", color: "#8FF0C4", size: 36 },
+  ];
+  const bubbles = [
+    { left: "12%", dur: 9, delay: 0, size: 8 },
+    { left: "28%", dur: 12, delay: 3, size: 5 },
+    { left: "48%", dur: 10, delay: 6, size: 10 },
+    { left: "66%", dur: 13, delay: 1, size: 6 },
+    { left: "84%", dur: 8, delay: 4, size: 7 },
+    { left: "92%", dur: 11, delay: 8, size: 4 },
+  ];
+
+  return (
+    <div aria-hidden="true" style={{ position: "fixed", inset: 0, pointerEvents: "none", overflow: "hidden", zIndex: 0 }}>
+      {/* Raios de luz da superfície */}
+      <div
+        className="water-shimmer"
+        style={{
+          position: "absolute", inset: 0,
+          background:
+            "linear-gradient(115deg, transparent 30%, rgba(180,240,255,0.10) 42%, transparent 52%), linear-gradient(75deg, transparent 55%, rgba(150,230,255,0.08) 66%, transparent 74%)",
+        }}
+      />
+
+      {/* Peixinhos */}
+      {fishes.map((f, i) => (
+        <div
+          key={i}
+          style={{
+            position: "absolute",
+            top: f.top,
+            left: 0,
+            willChange: "transform",
+            animation: `${f.dir === "r" ? "fish-swim-r" : "fish-swim-l"} ${f.dur}s linear infinite`,
+            animationDelay: `${f.delay}s`,
+          }}
+        >
+          <Fish color={f.color} size={f.size} />
+        </div>
+      ))}
+
+      {/* Bolhas subindo */}
+      {bubbles.map((b, i) => (
+        <div
+          key={i}
+          style={{
+            position: "absolute",
+            bottom: "-20px",
+            left: b.left,
+            width: `${b.size}px`,
+            height: `${b.size}px`,
+            borderRadius: "50%",
+            background: "radial-gradient(circle at 30% 30%, rgba(255,255,255,0.9), rgba(180,235,255,0.25))",
+            border: "1px solid rgba(255,255,255,0.25)",
+            willChange: "transform, opacity",
+            animation: `bubble-rise ${b.dur}s ease-in infinite`,
+            animationDelay: `${b.delay}s`,
+          }}
+        />
+      ))}
+
+      {/* Algas no fundo */}
+      <div style={{ position: "absolute", bottom: "-6px", left: 0, right: 0, height: "160px", display: "flex", alignItems: "flex-end", justifyContent: "space-between", padding: "0 4vw" }}>
+        <Algae tall={120} color="#1F9E6E" className="algae-sway" />
+        <Algae tall={90} color="#2BB37E" className="algae-sway-2" />
+        <Algae tall={150} color="#178C5E" className="algae-sway" />
+        <Algae tall={70} color="#33C48C" className="algae-sway-2" />
+        <Algae tall={130} color="#1F9E6E" className="algae-sway" />
+        <Algae tall={100} color="#2BB37E" className="algae-sway-2" />
+        <Algae tall={140} color="#178C5E" className="algae-sway" />
+      </div>
+
+      {/* Escurecimento no fundo (profundidade) */}
+      <div style={{ position: "absolute", inset: 0, background: "linear-gradient(180deg, transparent 55%, rgba(2,20,45,0.55) 100%)" }} />
+    </div>
+  );
+}
+
+// ─── HubScreen ─────────────────────────────────────────────────────────────────
+
 interface HubScreenProps {
   onEnterWorld: (id: WorldId) => void;
 }
@@ -900,40 +1047,22 @@ function HubScreen({ onEnterWorld }: HubScreenProps) {
     <div
       style={{
         minHeight: "100svh",
-        background: "linear-gradient(160deg, #0A0A1A 0%, #0D0D0F 50%, #0A0F0A 100%)",
+        background: "linear-gradient(180deg, #1E6FA8 0%, #12507E 34%, #0A3A63 64%, #052642 100%)",
         display: "flex",
         flexDirection: "column",
         overflowY: "auto",
         fontFamily: "'Plus Jakarta Sans', sans-serif",
       }}
     >
-      {/* Stars bg */}
-      <div aria-hidden="true" style={{ position: "fixed", inset: 0, pointerEvents: "none", overflow: "hidden" }}>
-        {[...Array(30)].map((_, i) => (
-          <div
-            key={i}
-            style={{
-              position: "absolute",
-              width: i % 4 === 0 ? "3px" : "2px",
-              height: i % 4 === 0 ? "3px" : "2px",
-              borderRadius: "50%",
-              background: "white",
-              top: `${Math.sin(i * 137.5) * 40 + 50}%`,
-              left: `${Math.cos(i * 137.5) * 40 + 50}%`,
-              opacity: 0.15 + (i % 5) * 0.1,
-              animation: `hub-stars ${2 + (i % 4)}s ease-in-out infinite`,
-              animationDelay: `${(i * 0.3) % 4}s`,
-            }}
-          />
-        ))}
-      </div>
+      {/* Ocean bg */}
+      <OceanBackground />
 
       {/* Header */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
-        style={{ padding: "48px 24px 32px", display: "flex", flexDirection: "column", alignItems: "center", gap: "12px" }}
+        style={{ padding: "48px 24px 32px", display: "flex", flexDirection: "column", alignItems: "center", gap: "12px", position: "relative", zIndex: 1 }}
       >
         {/* Avatar */}
         <div
@@ -962,14 +1091,11 @@ function HubScreen({ onEnterWorld }: HubScreenProps) {
           <h1 style={{ fontSize: "22px", fontWeight: 800, color: "#FFFFFF", letterSpacing: "-0.02em", margin: 0 }}>
             Meus Achadinhos
           </h1>
-          <p style={{ fontSize: "15px", color: "#8080A0", marginTop: "4px", fontWeight: 400 }}>
-            Pesca • Cozinha • Vídeos
-          </p>
         </div>
 
         <p
           style={{
-            fontSize: "14px", color: "#6060A0",
+            fontSize: "14px", color: "#BEE7FF",
             letterSpacing: "0.12em", textTransform: "uppercase",
             fontWeight: 500, marginTop: "4px",
           }}
@@ -989,6 +1115,8 @@ function HubScreen({ onEnterWorld }: HubScreenProps) {
           maxWidth: "480px",
           width: "100%",
           margin: "0 auto",
+          position: "relative",
+          zIndex: 1,
         }}
         className="lg:grid-cols-3 lg:max-w-5xl lg:gap-6 lg:grid"
       >
