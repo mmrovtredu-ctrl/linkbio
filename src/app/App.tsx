@@ -386,16 +386,6 @@ function World3DCard({ worldId, index, onClick }: World3DCardProps) {
     applyTilt(nx, ny);
   }, [applyTilt]);
 
-  const handleTouchMove = useCallback((e: React.TouchEvent) => {
-    e.preventDefault();
-    const touch = e.touches[0];
-    const rect = containerRef.current?.getBoundingClientRect();
-    if (!rect) return;
-    const nx = ((touch.clientX - rect.left) / rect.width - 0.5) * 2;
-    const ny = ((touch.clientY - rect.top) / rect.height - 0.5) * 2;
-    applyTilt(nx, ny);
-  }, [applyTilt]);
-
   useEffect(() => () => cancelAnimationFrame(animRef.current), []);
 
   const shadowX = tilt.y * 2;
@@ -422,9 +412,6 @@ function World3DCard({ worldId, index, onClick }: World3DCardProps) {
       onMouseMove={handleMouseMove}
       onMouseLeave={() => { setInteracting(false); resetTilt(); }}
       onMouseEnter={() => setInteracting(true)}
-      onTouchStart={() => setInteracting(true)}
-      onTouchMove={handleTouchMove}
-      onTouchEnd={() => { setInteracting(false); resetTilt(); }}
       onClick={handleClick}
       role="button"
       aria-label={emConstrucao ? `${world.name} — em construção` : `Entrar no mundo ${world.name}`}
@@ -643,23 +630,12 @@ function ProductCard({ product, world, index, isTikTok }: ProductCardProps) {
   const [tilt, setTilt] = useState({ x: 0, y: 0 });
   const ref = useRef<HTMLDivElement>(null);
 
-  const handleTouch = (e: React.TouchEvent) => {
-    const touch = e.touches[0];
-    const rect = ref.current?.getBoundingClientRect();
-    if (!rect) return;
-    const nx = ((touch.clientX - rect.left) / rect.width - 0.5) * 2;
-    const ny = ((touch.clientY - rect.top) / rect.height - 0.5) * 2;
-    setTilt({ x: -ny * 8, y: nx * 8 });
-  };
-
   return (
     <motion.div
       ref={ref}
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.35, delay: index * 0.05, ease: [0.22, 1, 0.36, 1] }}
-      onTouchMove={handleTouch}
-      onTouchEnd={() => setTilt({ x: 0, y: 0 })}
       onMouseMove={(e) => {
         const rect = ref.current?.getBoundingClientRect();
         if (!rect) return;
@@ -887,23 +863,21 @@ function Footer({ world }: { world?: typeof WORLDS[WorldId] }) {
       }}
     >
       <div style={{ display: "flex", gap: "20px", marginBottom: "4px" }}>
-        {["@seuinstagram", "@seutiktok"].map((handle) => (
-          <a
-            key={handle}
-            href="#"
-            onClick={(e) => e.preventDefault()}
-            style={{
-              fontFamily: font, fontSize: "13px", fontWeight: 600,
-              color: text, textDecoration: "none",
-              display: "flex", alignItems: "center", gap: "4px",
-              minHeight: "44px",
-              padding: "4px 8px",
-            }}
-            aria-label={handle}
-          >
-            {handle}
-          </a>
-        ))}
+        <a
+          href="https://www.instagram.com/marianabritoig?igsh=aW8xcnhtNXN0ZHlm"
+          target="_blank"
+          rel="noopener noreferrer"
+          style={{
+            fontFamily: font, fontSize: "13px", fontWeight: 600,
+            color: text, textDecoration: "none",
+            display: "flex", alignItems: "center", gap: "6px",
+            minHeight: "44px",
+            padding: "4px 8px",
+          }}
+          aria-label="Instagram @marianabritoig"
+        >
+          <span aria-hidden="true">📸</span> @marianabritoig
+        </a>
       </div>
       <p style={{ fontFamily: font, fontSize: "12px", color: text, textAlign: "center", lineHeight: 1.5, maxWidth: "320px" }}>
         Ao comprar pelos meus links, posso receber uma comissão da loja — sem custo extra pra você. 🧡
