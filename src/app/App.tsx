@@ -233,38 +233,52 @@ const KEYFRAMES = `
   }
 
   /* ── Fundo do mar ─────────────────────────────── */
+  /* ── Fundo do mar ─────────────────────────────── */
   @keyframes fish-swim-r {
-    0%   { transform: translateX(-15vw) translateY(0) scaleX(1); }
-    50%  { transform: translateX(55vw) translateY(-14px) scaleX(1); }
-    100% { transform: translateX(120vw) translateY(0) scaleX(1); }
+    0%   { transform: translateX(-20vw); }
+    100% { transform: translateX(122vw); }
   }
   @keyframes fish-swim-l {
-    0%   { transform: translateX(120vw) translateY(0) scaleX(-1); }
-    50%  { transform: translateX(45vw) translateY(16px) scaleX(-1); }
-    100% { transform: translateX(-20vw) translateY(0) scaleX(-1); }
+    0%   { transform: translateX(122vw); }
+    100% { transform: translateX(-22vw); }
+  }
+  @keyframes fish-bob {
+    0%, 100% { transform: translateY(0) rotate(-2.5deg); }
+    50%      { transform: translateY(-7px) rotate(2.5deg); }
+  }
+  @keyframes fish-tail {
+    0%, 100% { transform: rotate(-9deg); }
+    50%      { transform: rotate(9deg); }
   }
   @keyframes algae-sway {
-    0%, 100% { transform: rotate(-5deg); }
-    50%      { transform: rotate(6deg); }
+    0%, 100% { transform: rotate(-6deg); }
+    50%      { transform: rotate(7deg); }
   }
   @keyframes algae-sway-2 {
-    0%, 100% { transform: rotate(4deg); }
-    50%      { transform: rotate(-6deg); }
+    0%, 100% { transform: rotate(5deg); }
+    50%      { transform: rotate(-7deg); }
   }
   @keyframes bubble-rise {
-    0%   { transform: translateY(0) translateX(0); opacity: 0; }
-    10%  { opacity: 0.7; }
+    0%   { transform: translateY(0) translateX(0) scale(0.8); opacity: 0; }
+    10%  { opacity: 0.75; }
+    50%  { transform: translateY(-45vh) translateX(10px) scale(1); }
     90%  { opacity: 0.5; }
-    100% { transform: translateY(-88vh) translateX(14px); opacity: 0; }
+    100% { transform: translateY(-92vh) translateX(20px) scale(1.05); opacity: 0; }
   }
-  @keyframes water-shimmer {
-    0%, 100% { opacity: 0.25; transform: translateY(0); }
-    50%      { opacity: 0.5; transform: translateY(-10px); }
+  @keyframes godray-drift {
+    0%, 100% { opacity: 0.18; transform: translateX(0) skewX(-8deg); }
+    50%      { opacity: 0.42; transform: translateX(22px) skewX(-8deg); }
+  }
+  @keyframes plankton-drift {
+    0%   { transform: translate(0, 0); opacity: 0; }
+    15%  { opacity: 0.6; }
+    85%  { opacity: 0.6; }
+    100% { transform: translate(30px, -40px); opacity: 0; }
   }
 
   .algae-sway   { animation: algae-sway 4.5s ease-in-out infinite; transform-origin: bottom center; }
   .algae-sway-2 { animation: algae-sway-2 5.5s ease-in-out infinite; transform-origin: bottom center; }
-  .water-shimmer { animation: water-shimmer 7s ease-in-out infinite; }
+  .fish-tail    { animation: fish-tail 0.6s ease-in-out infinite; transform-origin: left center; }
 
   .typing-arm-l { animation: typing-arm 0.5s ease-in-out infinite; transform-origin: right center; }
   .typing-arm-r { animation: typing-arm 0.5s ease-in-out infinite 0.25s; transform-origin: left center; }
@@ -273,9 +287,10 @@ const KEYFRAMES = `
   .girl-ponytail { animation: ponytail-sway 3.2s ease-in-out infinite; transform-origin: top center; }
 
   @media (prefers-reduced-motion: reduce) {
-    *, *::before, *::after {
-      animation-duration: 0.01ms !important;
-      animation-iteration-count: 1 !important;
+    /* Mantemos as animações ambientes suaves do fundo do mar (peixes, algas,
+       bolhas) rodando de propósito — elas são o conceito da página. Apenas
+       encurtamos transições de UI mais bruscas. */
+    .reduce-safe {
       transition-duration: 0.01ms !important;
     }
   }
@@ -929,73 +944,142 @@ const SHOPEE_SITE_URL = "https://shoppe-zeta-three.vercel.app/";
 
 // ─── OceanBackground (fundo do mar interativo) ─────────────────────────────────
 
-function Fish({ color, size }: { color: string; size: number }) {
+function Fish({ color, size, id }: { color: string; size: number; id: string }) {
+  const gid = `fish-${id}`;
   return (
-    <svg viewBox="0 0 64 34" width={size} height={size * 0.53} aria-hidden="true" style={{ display: "block", filter: "drop-shadow(0 2px 4px rgba(0,0,0,0.25))" }}>
-      {/* corpo */}
-      <path d="M6 17 C 14 4, 40 4, 50 17 C 40 30, 14 30, 6 17 Z" fill={color} />
-      {/* cauda */}
-      <path d="M50 17 L 63 7 L 60 17 L 63 27 Z" fill={color} opacity="0.85" />
+    <svg viewBox="0 0 78 44" width={size} height={size * (44 / 78)} aria-hidden="true" style={{ display: "block", overflow: "visible", filter: "drop-shadow(0 4px 6px rgba(0,10,30,0.35))" }}>
+      <defs>
+        {/* volume do corpo: luz em cima, sombra embaixo */}
+        <linearGradient id={`${gid}-hl`} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stopColor="#ffffff" stopOpacity="0.6" />
+          <stop offset="0.5" stopColor="#ffffff" stopOpacity="0" />
+        </linearGradient>
+        <linearGradient id={`${gid}-sh`} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0.5" stopColor="#001b2e" stopOpacity="0" />
+          <stop offset="1" stopColor="#001b2e" stopOpacity="0.4" />
+        </linearGradient>
+        <radialGradient id={`${gid}-spec`} cx="0.35" cy="0.3" r="0.5">
+          <stop offset="0" stopColor="#ffffff" stopOpacity="0.7" />
+          <stop offset="1" stopColor="#ffffff" stopOpacity="0" />
+        </radialGradient>
+        {/* corpo reutilizável */}
+        <path id={`${gid}-body`} d="M10 22 C 16 7, 44 7, 54 20 C 55 21, 55 23, 54 24 C 44 37, 16 37, 10 22 Z" />
+      </defs>
+
+      {/* cauda (animada) */}
+      <g className="fish-tail" style={{ transformOrigin: "54px 22px" }}>
+        <path d="M54 22 C 62 15, 69 11, 76 8 C 71 16, 71 28, 76 36 C 69 33, 62 29, 54 22 Z" fill={color} />
+        <path d="M54 22 C 62 15, 69 11, 76 8 C 71 16, 71 28, 76 36 C 69 33, 62 29, 54 22 Z" fill={`url(#${gid}-sh)`} />
+      </g>
+
+      {/* barbatana dorsal */}
+      <path d="M28 9 C 33 1, 43 1, 46 8 C 39 8, 33 9, 29 12 Z" fill={color} opacity="0.9" />
+      {/* barbatana ventral */}
+      <path d="M30 34 C 33 41, 41 42, 44 36 C 38 36, 33 35, 31 33 Z" fill={color} opacity="0.75" />
+
+      {/* corpo com sombreamento 3D */}
+      <use href={`#${gid}-body`} fill={color} />
+      <use href={`#${gid}-body`} fill={`url(#${gid}-hl)`} />
+      <use href={`#${gid}-body`} fill={`url(#${gid}-sh)`} />
+      <use href={`#${gid}-body`} fill={`url(#${gid}-spec)`} />
+
+      {/* guelra */}
+      <path d="M24 12 C 21 16, 21 28, 24 32" fill="none" stroke="#001b2e" strokeOpacity="0.18" strokeWidth="1.6" strokeLinecap="round" />
+
       {/* olho */}
-      <circle cx="18" cy="15" r="2.2" fill="#fff" />
-      <circle cx="18.6" cy="15" r="1.1" fill="#0A2540" />
-      {/* barbatana */}
-      <path d="M26 17 C 30 22, 36 22, 38 25 C 32 25, 28 22, 26 17 Z" fill="rgba(255,255,255,0.35)" />
+      <circle cx="19" cy="20" r="3" fill="#ffffff" />
+      <circle cx="19.8" cy="20.2" r="1.7" fill="#0A2540" />
+      <circle cx="18.6" cy="19.2" r="0.7" fill="#ffffff" />
     </svg>
   );
 }
 
-function Algae({ tall, color, className }: { tall: number; color: string; className: string }) {
+function Algae({ tall, color, tip, className }: { tall: number; color: string; tip: string; className: string }) {
+  const gid = `al-${tall}-${color.replace("#", "")}`;
   return (
-    <svg viewBox={`0 0 24 ${tall}`} width={24} height={tall} aria-hidden="true" className={className} style={{ display: "block" }}>
-      <path d={`M12 ${tall} C 4 ${tall * 0.7}, 20 ${tall * 0.5}, 10 ${tall * 0.28} C 4 ${tall * 0.14}, 14 ${tall * 0.05}, 12 0`} fill="none" stroke={color} strokeWidth="7" strokeLinecap="round" opacity="0.8" />
+    <svg viewBox={`0 0 30 ${tall}`} width={30} height={tall} aria-hidden="true" className={className} style={{ display: "block", overflow: "visible" }}>
+      <defs>
+        <linearGradient id={gid} x1="0" y1="1" x2="0" y2="0">
+          <stop offset="0" stopColor={color} />
+          <stop offset="1" stopColor={tip} />
+        </linearGradient>
+      </defs>
+      {/* folha principal (preenchida, com brilho) */}
+      <path
+        d={`M15 ${tall}
+            C 5 ${tall * 0.72}, 24 ${tall * 0.55}, 12 ${tall * 0.34}
+            C 5 ${tall * 0.2}, 18 ${tall * 0.08}, 15 0
+            C 19 ${tall * 0.1}, 12 ${tall * 0.22}, 19 ${tall * 0.36}
+            C 27 ${tall * 0.54}, 22 ${tall * 0.74}, 15 ${tall} Z`}
+        fill={`url(#${gid})`}
+        opacity="0.92"
+      />
+      {/* nervura clara pra dar volume */}
+      <path
+        d={`M15 ${tall} C 8 ${tall * 0.7}, 20 ${tall * 0.5}, 13 ${tall * 0.3} C 8 ${tall * 0.16}, 16 ${tall * 0.06}, 15 0`}
+        fill="none" stroke={tip} strokeOpacity="0.5" strokeWidth="1.5" strokeLinecap="round"
+      />
     </svg>
   );
 }
 
 function OceanBackground() {
   const fishes = [
-    { top: "18%", dur: 26, delay: 0, dir: "r", color: "#FF9F4D", size: 46 },
-    { top: "34%", dur: 34, delay: 4, dir: "l", color: "#6FE3FF", size: 34 },
-    { top: "52%", dur: 30, delay: 9, dir: "r", color: "#FFD24D", size: 40 },
-    { top: "68%", dur: 38, delay: 2, dir: "l", color: "#FF7D9C", size: 30 },
-    { top: "80%", dur: 28, delay: 13, dir: "r", color: "#8FF0C4", size: 36 },
+    { top: "16%", dur: 24, delay: 0, dir: "r", color: "#FF9F4D", size: 52, blur: 0, op: 1, bob: 3.4 },
+    { top: "30%", dur: 33, delay: 5, dir: "l", color: "#7FE7FF", size: 34, blur: 1.2, op: 0.7, bob: 4.2 },
+    { top: "46%", dur: 28, delay: 9, dir: "r", color: "#FFD24D", size: 44, blur: 0, op: 1, bob: 3.8 },
+    { top: "60%", dur: 37, delay: 2, dir: "l", color: "#FF7D9C", size: 30, blur: 1.4, op: 0.65, bob: 4.6 },
+    { top: "74%", dur: 26, delay: 13, dir: "r", color: "#8FF0C4", size: 40, blur: 0, op: 1, bob: 3.2 },
+    { top: "86%", dur: 40, delay: 7, dir: "l", color: "#C9A8FF", size: 26, blur: 1.6, op: 0.6, bob: 5 },
   ];
   const bubbles = [
     { left: "12%", dur: 9, delay: 0, size: 8 },
     { left: "28%", dur: 12, delay: 3, size: 5 },
-    { left: "48%", dur: 10, delay: 6, size: 10 },
+    { left: "48%", dur: 10, delay: 6, size: 11 },
     { left: "66%", dur: 13, delay: 1, size: 6 },
     { left: "84%", dur: 8, delay: 4, size: 7 },
     { left: "92%", dur: 11, delay: 8, size: 4 },
   ];
+  const plankton = [
+    { left: "20%", top: "40%", dur: 14, delay: 0 },
+    { left: "40%", top: "60%", dur: 18, delay: 4 },
+    { left: "58%", top: "30%", dur: 16, delay: 8 },
+    { left: "74%", top: "55%", dur: 20, delay: 2 },
+    { left: "88%", top: "44%", dur: 15, delay: 6 },
+    { left: "10%", top: "70%", dur: 17, delay: 10 },
+  ];
 
   return (
     <div aria-hidden="true" style={{ position: "fixed", inset: 0, pointerEvents: "none", overflow: "hidden", zIndex: 0 }}>
-      {/* Raios de luz da superfície */}
-      <div
-        className="water-shimmer"
-        style={{
-          position: "absolute", inset: 0,
-          background:
-            "linear-gradient(115deg, transparent 30%, rgba(180,240,255,0.10) 42%, transparent 52%), linear-gradient(75deg, transparent 55%, rgba(150,230,255,0.08) 66%, transparent 74%)",
-        }}
-      />
+      {/* Brilho suave da superfície */}
+      <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: "40%", background: "radial-gradient(120% 100% at 50% 0%, rgba(150,225,255,0.28), transparent 70%)" }} />
 
-      {/* Peixinhos */}
+      {/* Raios de luz (god rays) que se movem */}
+      <div style={{ position: "absolute", top: "-10%", left: "10%", width: "60px", height: "120%", background: "linear-gradient(to bottom, rgba(180,240,255,0.35), transparent 75%)", filter: "blur(6px)", willChange: "transform, opacity", animation: "godray-drift 9s ease-in-out infinite" }} />
+      <div style={{ position: "absolute", top: "-10%", left: "44%", width: "90px", height: "120%", background: "linear-gradient(to bottom, rgba(160,230,255,0.28), transparent 72%)", filter: "blur(8px)", willChange: "transform, opacity", animation: "godray-drift 11s ease-in-out infinite 2s" }} />
+      <div style={{ position: "absolute", top: "-10%", left: "76%", width: "50px", height: "120%", background: "linear-gradient(to bottom, rgba(180,240,255,0.3), transparent 75%)", filter: "blur(6px)", willChange: "transform, opacity", animation: "godray-drift 10s ease-in-out infinite 4s" }} />
+
+      {/* Plâncton flutuando */}
+      {plankton.map((p, i) => (
+        <div key={`pk-${i}`} style={{ position: "absolute", left: p.left, top: p.top, width: "3px", height: "3px", borderRadius: "50%", background: "rgba(200,245,255,0.8)", boxShadow: "0 0 4px rgba(200,245,255,0.6)", willChange: "transform, opacity", animation: `plankton-drift ${p.dur}s ease-in-out infinite`, animationDelay: `${p.delay}s` }} />
+      ))}
+
+      {/* Peixinhos (nado + balanço, com profundidade) */}
       {fishes.map((f, i) => (
         <div
           key={i}
           style={{
-            position: "absolute",
-            top: f.top,
-            left: 0,
+            position: "absolute", top: f.top, left: 0,
             willChange: "transform",
             animation: `${f.dir === "r" ? "fish-swim-r" : "fish-swim-l"} ${f.dur}s linear infinite`,
             animationDelay: `${f.delay}s`,
           }}
         >
-          <Fish color={f.color} size={f.size} />
+          <div style={{ transform: f.dir === "l" ? "scaleX(-1)" : "none", filter: f.blur ? `blur(${f.blur}px)` : "none", opacity: f.op }}>
+            <div style={{ willChange: "transform", animation: `fish-bob ${f.bob}s ease-in-out infinite`, animationDelay: `${f.delay * 0.5}s` }}>
+              <Fish color={f.color} size={f.size} id={`${i}`} />
+            </div>
+          </div>
         </div>
       ))}
 
@@ -1004,14 +1088,11 @@ function OceanBackground() {
         <div
           key={i}
           style={{
-            position: "absolute",
-            bottom: "-20px",
-            left: b.left,
-            width: `${b.size}px`,
-            height: `${b.size}px`,
-            borderRadius: "50%",
-            background: "radial-gradient(circle at 30% 30%, rgba(255,255,255,0.9), rgba(180,235,255,0.25))",
-            border: "1px solid rgba(255,255,255,0.25)",
+            position: "absolute", bottom: "-20px", left: b.left,
+            width: `${b.size}px`, height: `${b.size}px`, borderRadius: "50%",
+            background: "radial-gradient(circle at 32% 28%, rgba(255,255,255,0.95), rgba(180,235,255,0.2) 70%)",
+            border: "1px solid rgba(255,255,255,0.3)",
+            boxShadow: "inset -1px -1px 2px rgba(0,40,70,0.2)",
             willChange: "transform, opacity",
             animation: `bubble-rise ${b.dur}s ease-in infinite`,
             animationDelay: `${b.delay}s`,
@@ -1019,19 +1100,22 @@ function OceanBackground() {
         />
       ))}
 
-      {/* Algas no fundo */}
-      <div style={{ position: "absolute", bottom: "-6px", left: 0, right: 0, height: "160px", display: "flex", alignItems: "flex-end", justifyContent: "space-between", padding: "0 4vw" }}>
-        <Algae tall={120} color="#1F9E6E" className="algae-sway" />
-        <Algae tall={90} color="#2BB37E" className="algae-sway-2" />
-        <Algae tall={150} color="#178C5E" className="algae-sway" />
-        <Algae tall={70} color="#33C48C" className="algae-sway-2" />
-        <Algae tall={130} color="#1F9E6E" className="algae-sway" />
-        <Algae tall={100} color="#2BB37E" className="algae-sway-2" />
-        <Algae tall={140} color="#178C5E" className="algae-sway" />
+      {/* Leito de areia no fundo */}
+      <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, height: "70px", background: "radial-gradient(120% 90% at 50% 100%, rgba(60,95,120,0.55), transparent 70%)" }} />
+
+      {/* Algas no fundo (mais volumosas) */}
+      <div style={{ position: "absolute", bottom: "-8px", left: 0, right: 0, height: "170px", display: "flex", alignItems: "flex-end", justifyContent: "space-between", padding: "0 3vw" }}>
+        <Algae tall={130} color="#0F7A52" tip="#3FD69A" className="algae-sway" />
+        <Algae tall={95}  color="#128A5C" tip="#4FE0A6" className="algae-sway-2" />
+        <Algae tall={160} color="#0C6B48" tip="#39CC90" className="algae-sway" />
+        <Algae tall={75}  color="#159A66" tip="#5CE8B0" className="algae-sway-2" />
+        <Algae tall={140} color="#0F7A52" tip="#3FD69A" className="algae-sway" />
+        <Algae tall={108} color="#128A5C" tip="#4FE0A6" className="algae-sway-2" />
+        <Algae tall={150} color="#0C6B48" tip="#39CC90" className="algae-sway" />
       </div>
 
-      {/* Escurecimento no fundo (profundidade) */}
-      <div style={{ position: "absolute", inset: 0, background: "linear-gradient(180deg, transparent 55%, rgba(2,20,45,0.55) 100%)" }} />
+      {/* Profundidade (escurece o fundo) */}
+      <div style={{ position: "absolute", inset: 0, background: "linear-gradient(180deg, transparent 52%, rgba(2,18,40,0.6) 100%)" }} />
     </div>
   );
 }
