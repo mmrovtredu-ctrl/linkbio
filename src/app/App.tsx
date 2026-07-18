@@ -1075,7 +1075,7 @@ function OceanBackground() {
             animationDelay: `${f.delay}s`,
           }}
         >
-          <div style={{ transform: f.dir === "l" ? "scaleX(-1)" : "none", filter: f.blur ? `blur(${f.blur}px)` : "none", opacity: f.op }}>
+          <div style={{ transform: f.dir === "r" ? "scaleX(-1)" : "none", filter: f.blur ? `blur(${f.blur}px)` : "none", opacity: f.op }}>
             <div style={{ willChange: "transform", animation: `fish-bob ${f.bob}s ease-in-out infinite`, animationDelay: `${f.delay * 0.5}s` }}>
               <Fish color={f.color} size={f.size} id={`${i}`} />
             </div>
