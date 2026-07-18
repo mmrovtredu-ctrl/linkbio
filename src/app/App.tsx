@@ -931,7 +931,7 @@ function Footer({ world }: { world?: typeof WORLDS[WorldId] }) {
         </a>
       </div>
       <p style={{ fontFamily: font, fontSize: "12px", color: text, textAlign: "center", lineHeight: 1.5, maxWidth: "320px" }}>
-        Ao comprar pelos meus links, posso receber uma comissão da loja — sem custo extra pra você. 🧡
+        Aqui você encontra os produtos que eu amo e recomendo. 🧡
       </p>
     </footer>
   );
